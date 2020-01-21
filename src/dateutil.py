@@ -65,6 +65,7 @@ def timestamp_sec_to_datetime(ts):
 
 def strf_to_datetime(strf, date_format):
     """
+    时间标准字符串转datetime
     :param strf:
     :return:
     """
@@ -114,7 +115,7 @@ def tomorrow_y_m_d():
 
 def the_day_after_tomorrow_y_m_d():
     """
-    明天 y-m-d
+    后天 y-m-d
     :return:
     """
     return strf_y_m_d_add_day(today_y_m_d(), 2)
@@ -140,6 +141,12 @@ def is_valid_ymd(y_m_d):
     except ValueError:
         raise ValueError("Incorrect data format, should be yyyy-MM-DD")
 
+def datetime_add_day(dt, days):
+    return dt + datetime.timedelta(days=days)
+
+def datetime_deduct_day(dt, days):
+    return datetime_add_day(dt, -1 * days)
+
 def strf_y_m_d_add_day(y_m_d, days):
     """
     y-m-d这样的时间格式加x天（eg:2012-02-12）
@@ -147,7 +154,7 @@ def strf_y_m_d_add_day(y_m_d, days):
     :param days:
     :return:
     """
-    dt = strf_to_datetime(y_m_d, Y_M_D) + datetime.timedelta(days=days)
+    dt = datetime_add_day(strf_to_datetime(y_m_d, Y_M_D), days)
     return datetime_to_strf(dt, Y_M_D)
 
 def strf_y_m_d_deduct_day(y_m_d, days):
@@ -167,6 +174,16 @@ def is_same_day(d1, d2):
     :return:
     """
     return d1.year == d2.year and d1.month == d2.month and d1.day == d2.day
+
+def is_same_y_m_d(y_m_d1, y_m_d2):
+    """
+    判断两天是否是同一天
+    :param y_m_d1:
+    :param y_m_d2:
+    :return:
+    """
+    return y_m_d1 == y_m_d2
+
 
 def compare_datetime(d1, d2):
     """
@@ -202,3 +219,42 @@ def is_expire_day(strf, date_format):
     :return:
     """
     return 1 == compare_datetime(strf_to_datetime(strf, date_format), now_datetime())
+
+def datetime_range_day(start_datetime, r):
+    """
+    按照 range(day) 返回 datetime
+    :param start_datetime:
+    :param r:
+    :return:
+    """
+    for i in range(r):
+        yield datetime_add_day(start_datetime, r)
+
+def y_m_d_range_day(y_m_d, r):
+    """
+    按照 range(day) 返回 ymd
+    :param y_m_d:
+    :param r:
+    :return:
+    """
+    for i in range(r):
+        yield strf_y_m_d_add_day(y_m_d, i)
+
+
+def y_m_d_range(y_m_d_start, y_m_d_end):
+    """
+    返回两个时间段内的所有日期
+    :param y_m_d_start:
+    :param y_m_d_end:
+    :return:
+    """
+    i = 0
+    current_y_m_d = y_m_d_start
+    while not is_same_y_m_d(current_y_m_d, y_m_d_end):
+        current_y_m_d = strf_y_m_d_add_day(y_m_d_start, i)
+        yield current_y_m_d
+        i += 1
+
+
+
+
